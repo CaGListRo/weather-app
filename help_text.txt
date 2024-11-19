@@ -1,0 +1,14 @@
+Diese Wetter-App bezieht ihre Daten von der Seite www.open-meteo.com
+Das aktuelle Wetter (linke Seite) ergibt sich aus dem 'Best Match' Modell von Open Meteo.
+Bei der stündlichen Vorhersage (unten), sowie bei der Sechs-Tage-Vorhersage (oben rechts)
+wird jeweils der Mittelwert aus sechs verschiedenen Wettermodellen gebildet. Diese sechs sind: 
+Best Match, Deutscher Wetterdienst (DWD Icon Seamless), GFS Seamless, GEM Seamless, JMA Seamless 
+und MeteoFrance Seamless.
+
+Legende:
+Nw = Niederschlagswahrscheinlichkeit in %
+Ns = Niederschlagshöhe in mm
+Wd = Wolkendecke in %
+Ld = Luftdruckdefizit in kPa
+Te = Temperatur in °C
+uv = UV-Index
