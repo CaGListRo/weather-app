@@ -156,7 +156,8 @@ class WeatherApp:
                 forecast_list.append(help_list)
         return forecast_list
 
-    def get_hourly_forecast(self):
+    def get_hourly_forecast(self) -> None:
+        """ Gets the hourly forecast. """
         hourly_best_match_list = self.get_forecast_list(self.model_list[0], daily=False)
         hourly_gem_list = self.get_forecast_list(self.model_list[1], daily=False)
         hourly_gfs_list = self.get_forecast_list(self.model_list[2], daily=False)
@@ -165,7 +166,8 @@ class WeatherApp:
         hourly_meteofrance_list = self.get_forecast_list(self.model_list[5], daily=False)
         self.hourly_mean_list = self.build_mean(hourly_best_match_list, hourly_gem_list, hourly_gfs_list, hourly_jma_list, hourly_icon_list, hourly_meteofrance_list, self.dates, daily=False)
 
-    def get_daily_forecast(self):
+    def get_daily_forecast(self) -> None:
+        """ Gets the daily forecast. """
         best_match_list = self.get_forecast_list(self.model_list[0], daily=True)
         gem_list = self.get_forecast_list(self.model_list[1], daily=True)
         gfs_list = self.get_forecast_list(self.model_list[2], daily=True)
@@ -174,7 +176,16 @@ class WeatherApp:
         meteofrance_list = self.get_forecast_list(self.model_list[5], daily=True)
         self.daily_mean_list = self.build_mean(best_match_list, gem_list, gfs_list, jma_list, icon_list, meteofrance_list, self.dates, daily=True)
 
-    def get_forecast_icon_name(self, precipitation_probability, cloud_cover, is_day):
+    def get_forecast_icon_name(self, precipitation_probability: float, cloud_cover: float, is_day: bool) -> str:
+        """
+        Gets the forecast icon name based on the given parameters.
+        Args:
+        precipitation_probability (float): The precipitation probability.
+        cloud_cover (float): The cloud cover.
+        is_day (bool): Whether it's day (True) or night (False).
+        Returns:
+        str: The forecast icon name.
+        """
         if is_day == 1:
             daytime = "tag"
         else:
@@ -203,8 +214,14 @@ class WeatherApp:
         
         return f"{daytime} {rain_prob} {clouds}"
 
-    def get_wind_direction(self, degree):
-        # switching the wind direction from degree to N, S, W, O, ... 
+    def get_wind_direction(self, degree: float | int) -> str:
+        """
+        Switches the wind direction from degree to N, S, W, O, ...
+        Args:
+        degree (float | int): The wind direction in degree.
+        Returns:
+        str: The wind direction.
+        """
         if degree >= 348 or degree <= 22:
             return "N"
         elif  22 < degree <= 68:
@@ -222,7 +239,8 @@ class WeatherApp:
         else:
             return "NW"
 
-    def get_current_weather_values(self):
+    def get_current_weather_values(self) -> None:
+        """ Gets the current weather values from the API and updates the weather values. """
         self.current_weather = []
         current = self.response.json()["current"]
         
@@ -232,7 +250,8 @@ class WeatherApp:
             else:
                 self.current_weather.append(current[condition])
 
-    def get_date_hour_day_number_and_is_day(self):
+    def get_date_hour_day_number_and_is_day(self) -> None:
+        """ Gets the date, hour, day number and if it is day or night from the API. """
         self.dates: list[str] = self.response.json()["daily"]["time"]
         self.is_day: list[str] = self.response.json()["current"]["is_day"]
         current_time = datetime.now()
@@ -240,19 +259,37 @@ class WeatherApp:
         todays_day = datetime.today()
         self.todays_number = todays_day.weekday()
 
-    def method_caller(self):
+    def method_caller(self) -> None:
+        """ Calls the methods to get the weather values and date values. """
         self.get_date_hour_day_number_and_is_day()
         self.get_current_weather_values()
         self.get_daily_forecast()
         self.get_hourly_forecast()
         
-    def get_response(self):
+    def get_response(self) -> None:
+        """ Gets the response from the API. """
         self.response = requests.get(self.api_adress)
 
-    def render_text(self, text, font, color):
+    def render_text(self, text: str, font: pg.font.Font, color: str) -> pg.Surface:
+        """
+        Renders the text on the screen.
+        Args:
+        text (str): The text to be rendered.
+        font (pg.font.Font): The font to be used.
+        color (str): The color of the text.
+        Returns:
+        pg.Surface: The rendered text.
+        """
         return font.render(text, 1, color)
 
-    def load_help_text(self, file_path):
+    def load_help_text(self, file_path: str) -> str:
+        """
+        Loads the help text from a file.
+        Args:
+        file_path (str): The path to the file.
+        Returns:
+        str: The loaded text.
+        """
         try:
             with open(file_path, "r", encoding="utf-8") as file:
                 text = file.read()
@@ -261,12 +298,12 @@ class WeatherApp:
             print(f"Die Datei {file_path} wurde nicht gefunden.")
             sys.exit()
 
-    def display_help_text(self):
+    def display_help_text(self) -> None:
+        """ Displays the help text. """
         y_position = 180
-        for line in self.text_lines:
+        for i, line in enumerate(self.text_lines):
             text_surface = self.MAIN_FONT.render(line, True, self.NORMAL_TEXT_COLOR)
-            self.WIN.blit(text_surface, (100, y_position))
-            y_position += 40
+            self.WIN.blit(text_surface, (100, y_position + 40 * i))
 
     def check_refresh_button_click(self):
         mouse_pos = pg.mouse.get_pos()
