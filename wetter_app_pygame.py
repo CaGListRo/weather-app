@@ -1,6 +1,5 @@
 import requests, sys
 import pygame as pg
-from icecream import ic
 from datetime import datetime
 
 from typing import Final
@@ -305,8 +304,9 @@ class WeatherApp:
             text_surface = self.MAIN_FONT.render(line, True, self.NORMAL_TEXT_COLOR)
             self.WIN.blit(text_surface, (100, y_position + 40 * i))
 
-    def check_refresh_button_click(self):
-        mouse_pos = pg.mouse.get_pos()
+    def check_refresh_button_click(self) -> None:
+        """ Checks if the refresh button was clicked. """
+        mouse_pos: tuple[int] = pg.mouse.get_pos()
         if self.refresh_button_rect.collidepoint(mouse_pos):
             self.refresh_button_color = self.BUTTON_HOVER_COLOR
             if pg.mouse.get_pressed()[0]:
@@ -321,7 +321,8 @@ class WeatherApp:
             self.refresh_button_color = self.BUTTON_COLOR
             self.refresh_button_elevation = 5
     
-    def check_help_button_click(self):
+    def check_help_button_click(self) -> None:
+        """ Checks if the help button was clicked. """
         mouse_pos = pg.mouse.get_pos()
         if self.help_button_rect.collidepoint(mouse_pos):
             self.help_button_color = self.BUTTON_HOVER_COLOR
@@ -339,7 +340,8 @@ class WeatherApp:
         # self.help_text_surf = self.MAIN_FONT.render(self.help_button_text, 1, self.NORMAL_TEXT_COLOR)
         # self.help_text_rect = self.help_text_surf.get_rect(center=self.help_button_rect.center)
 
-    def check_back_button_click(self):
+    def check_back_button_click(self) -> None:
+        """ Checks if the back button was clicked. """
         mouse_pos = pg.mouse.get_pos()
         if self.back_button_rect.collidepoint(mouse_pos):
             self.back_button_color = self.BUTTON_HOVER_COLOR
@@ -355,7 +357,8 @@ class WeatherApp:
             self.back_button_color = self.BUTTON_COLOR
             self.back_button_elevation = 5
 
-    def draw_buttons(self):
+    def draw_buttons(self) -> None:
+        """ Draws the buttons on the screen. """
         if not self.show_help:
             self.refresh_button_rect.y = 80 - self.refresh_button_elevation
             self.refresh_text_rect.center = self.refresh_button_rect.center
@@ -375,13 +378,15 @@ class WeatherApp:
             pg.draw.rect(self.WIN, self.back_button_color, self.back_button_rect, border_radius= 10)
             self.WIN.blit(self.back_text_surf, self.back_text_rect)
          
-    def draw_hourly_forecast_images(self):
+    def draw_hourly_forecast_images(self) -> None:
+        """ Draws the hourly forecast images on the screen. """
         for i in range(16):
             hourly_forecast_icon_string = self.get_forecast_icon_name(float(self.hourly_mean_list[0][i + self.current_hour]), float(self.hourly_mean_list[2][i + self.current_hour]), int(self.hourly_mean_list[6][i + self.current_hour]))
             hourly_forecast_icon = pg.transform.scale(pg.image.load(f"images/{hourly_forecast_icon_string}.png"), (50, 50))
             self.WIN.blit(hourly_forecast_icon, (65 + i * 81, 540))
 
-    def draw_hourly_forecast_text_elements(self):
+    def draw_hourly_forecast_text_elements(self) -> None:
+        """ Draws the hourly forecast text elements on the screen. """
         for i in range(16):
             forecast_hour = f"{self.current_hour + i}:00" if (self.current_hour + i < 24) else f"{self.current_hour - 24 + i}:00"  # calculate the hour label for 24 hours
             text_to_blit = self.render_text(forecast_hour, self.HOURLY_FONT, self.NORMAL_TEXT_COLOR)  # create the hour label
@@ -400,14 +405,15 @@ class WeatherApp:
                 text_to_blit = self.render_text(str(self.hourly_mean_list[j][i + self.current_hour]), self.HOURLY_FONT, value_color)
                 self.WIN.blit(text_to_blit, (75 + i * 81, 630 + j * 20))
 
-    def draw_daily_forecast_images(self):
+    def draw_daily_forecast_images(self) -> None:
+        """ Draws the daily forecast images on the screen. """
         for i in range(7):
             percent_daylight = round(float(self.daily_mean_list[7][i]) * 100 / float(self.daily_mean_list[6][i]), 2)
             daily_forecast_icon_string = self.get_forecast_icon_name(int(self.daily_mean_list[8][i]), 100-percent_daylight, 1)  # calculating cloud cover
             daily_forecast_icon = pg.transform.scale(pg.image.load(f"images/{daily_forecast_icon_string}.png").convert_alpha(), (80, 80))
             self.WIN.blit(daily_forecast_icon, (520 + i * 110, 80))
             
-    def draw_daily_forecast_text_elemets(self):
+    def draw_daily_forecast_text_elements(self) -> None:
         for a, attribute in enumerate(self.forecast_texts):
             text_to_blit = self.render_text(attribute, self.MAIN_FONT, self.NORMAL_TEXT_COLOR)
             self.WIN.blit(text_to_blit, (300, 200 + a * 30))
@@ -438,14 +444,16 @@ class WeatherApp:
             self.WIN.blit(text_to_blit, (x_cord + i * 110, 170))
             # print(f"{float(self.daily_mean_list[7][i])} : {float(self.daily_mean_list[6][i])} : {float(self.daily_mean_list[8][i])} : {percent_daylight}")
 
-    def draw_current_weather_icon(self):
+    def draw_current_weather_icon(self) -> None:
+        """ Draws the current weather icon on the screen. """
         # 25 mm precipitation is the highest normal value in germany, so this is assumed to be 100%
         precipitation_in_percent = round(float(self.current_weather[1]) * 100 / 25, 2)
         current_icon_name = self.get_forecast_icon_name(precipitation_in_percent, float(self.current_weather[0]), self.is_day)
         current_icon_image = pg.image.load(f"images/{current_icon_name}.png").convert_alpha()
         self.WIN.blit(current_icon_image, (50, 50))
 
-    def draw_current_weather_values(self):
+    def draw_current_weather_values(self) -> None:
+        """ Draws the current weather values on the screen. """
         for i in range(5):
             value_to_blit = self.render_text(self.current_weather_texts[i], self.MAIN_FONT, self.NORMAL_TEXT_COLOR)
             self.WIN.blit(value_to_blit, (50, 300 + i * 30))
@@ -454,21 +462,24 @@ class WeatherApp:
             value_to_blit = self.render_text(self.current_weather_units[i], self.MAIN_FONT, self.NORMAL_TEXT_COLOR)
             self.WIN.blit(value_to_blit, (210, 300 + i * 30))
 
-    def draw_icon_surfaces(self):
+    def draw_icon_surfaces(self) -> None:
+        """ Draws the icon surfaces on the screen. """
         pg.draw.rect(self.WIN, self.SYMBOL_RECT_COLOR, (55, 55, 182, 182), border_radius=15)
         for i in range(7):
             pg.draw.rect(self.WIN, self.SYMBOL_RECT_COLOR, (522 + i * 110, 82, 76, 76), border_radius=13)
         for i in range(16):
             pg.draw.rect(self.WIN, self.SYMBOL_RECT_COLOR, (66 + i * 81, 541, 48, 48), border_radius=11)
 
-    def draw_icon_surface_accents(self):
+    def draw_icon_surface_accents(self) -> None:
+        """ Draws the icon surface accents on the screen. """
         pg.draw.rect(self.WIN, self.ACCENT_COLOR, (50, 50, 192, 192), border_radius=15)
         for i in range(7):
             pg.draw.rect(self.WIN, self.ACCENT_COLOR, (520 + i * 110, 80, 80, 80), border_radius=13)
         for i in range(16):
             pg.draw.rect(self.WIN, self.ACCENT_COLOR, (65 + i * 81, 540, 50, 50), border_radius=11)
 
-    def draw_seperators(self):
+    def draw_separators(self) -> None:
+        """ Draws the separators on the screen. """
         pg.draw.line(self.WIN, self.SEPARATOR_COLOR, (280, 50), (280, 495))
         pg.draw.line(self.WIN, self.SEPARATOR_COLOR, (1330, 225), (1330, 315))
         pg.draw.line(self.WIN, self.SEPARATOR_COLOR, (1330, 345), (1330, 465))
@@ -482,7 +493,8 @@ class WeatherApp:
         for i in range(15):
             pg.draw.line(self.WIN, self.SEPARATOR_COLOR, (120 + i * 81, 600), (120 + i * 81, 732))
 
-    def draw_headings_and_legend(self):
+    def draw_headings_and_legend(self) -> None:
+        """ Draws the headings and legend on the screen. """
         text_to_blit = self.render_text("6-Tage-Vorhersage", self.HEADING_FONT, self.NORMAL_TEXT_COLOR)
         self.WIN.blit(text_to_blit, (632, 35))
         text_to_blit = self.render_text("Aktuelles Wetter", self.HEADING_FONT, self.NORMAL_TEXT_COLOR)
@@ -492,22 +504,24 @@ class WeatherApp:
         text_to_blit = self.render_text("Nw = Niederschlagswahrscheinlichkeit in %  |  Ns = Niederschlagshöhe in mm  |  Wd = Wolkendecke in %  |  Ld = Luftdruckdefizit in kPa  |  Te = Temperatur in °C  |  uv = UV-Index", self.SMALL_FONT, self.NORMAL_TEXT_COLOR)
         self.WIN.blit(text_to_blit, (250, 758))
 
-    def draw_underlines(self):
+    def draw_underlines(self) -> None:
+        """ Draws the underlines on the screen. """
         pg.draw.line(self.WIN, self.UNDERLINE_COLOR, (632, 63), (842,63), 2)
         pg.draw.line(self.WIN, self.UNDERLINE_COLOR, (50, 288), (242,288), 2)
         pg.draw.line(self.WIN, self.UNDERLINE_COLOR, (65, 528), (389,528), 2)
 
-    def draw_window(self):
+    def draw_window(self) -> None:
+        """ Draws the window, with calling all the draw methods. """
         self.WIN.fill(self.BACKGROUND_COLOR)
         if not self.show_help:
             self.draw_underlines()
             self.draw_headings_and_legend()
             self.draw_icon_surface_accents()
             self.draw_icon_surfaces()
-            self.draw_seperators()
+            self.draw_separators()
             self.draw_current_weather_values()
             self.draw_current_weather_icon()
-            self.draw_daily_forecast_text_elemets()
+            self.draw_daily_forecast_text_elements()
             self.draw_daily_forecast_images()
             self.draw_hourly_forecast_text_elements()
             self.draw_hourly_forecast_images()
@@ -519,7 +533,8 @@ class WeatherApp:
         self.draw_buttons()
         pg.display.update()
 
-    def main(self):
+    def main(self) -> None:
+        """ Main method of the application. """
         run = True
         self.response_timer = 27000
         while run:
